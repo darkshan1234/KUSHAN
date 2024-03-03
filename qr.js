@@ -1,5 +1,5 @@
 const PastebinAPI = require('pastebin-js'),
-pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
+pastebin = new PastebinAPI('h4cO2gJEMwmgmBoteYufW6_weLvBYCqT')
 const {makeid} = require('./id');
 const QRCode = require('qrcode');
 const express = require('express');
@@ -55,7 +55,7 @@ router.get('/', async (req, res) => {
 					await delay(10000);
 					const output = await pastebin.createPasteFromFile(__dirname+`/temp/${id}/creds.json`, "pastebin-js test", null, 1, "N");
 					await session.sendMessage(session.user.id, {
-						text: output.split('/')[3]
+						text: "DARKSHAN;;;" + output.split('/')[3]
 					})
 					await delay(100);
 					await session.ws.close();
