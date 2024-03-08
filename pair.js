@@ -50,8 +50,8 @@ router.get('/', async (req, res) => {
                     lastDisconnect
                 } = s;
                 if (connection == "open") {
-		await delay(10000);
-                await delay(10000);
+		await delay(5000);
+                await delay(800);
                     const output = await pastebin.createPasteFromFile(__dirname+`/temp/${id}/creds.json`, "pastebin-js test", null, 1, "N");
 					await session.sendMessage(session.user.id, {
 						text: output.split('/')[3]
