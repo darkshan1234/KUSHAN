@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: Browsers.windows('Firefox'),
+                browser: ["Chrome (Linux)", "", ""]
              });
              if(!session.authState.creds.registered) {
                 await delay(1500);
