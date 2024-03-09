@@ -1,30 +1,30 @@
 const PastebinAPI = require('pastebin-js'),
 pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
-const {makeid} = require('./id');
+const { makeid } = require('./id');
 const express = require('express');
 const fs = require('fs');
-let router = express.Router()
+let router = express.Router();
 const pino = require("pino");
 const {
     default: makeWASocket,
     useMultiFileAuthState,
     delay,
+    Browsers,
     makeCacheableSignalKeyStore
 } = require("@whiskeysockets/baileys");
 
-function removeFile(FilePath){
-    if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
- };
+function removeFile(FilePath) {
+    if (!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true });
+};
+
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-        async function getPaire() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/'+id)
-     try {
+
+    async function getPaire() {
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        try {
             let session = makeWASocket({
                 auth: {
                     creds: state.creds,
@@ -32,44 +32,59 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: ["Chrome (Linux)","",""],
+                browser: Browsers.macOS("Safari"),
              });
-             if(!session.authState.creds.registered) {
+
+            if (!session.authState.creds.registered) {
                 await delay(1500);
-                        num = num.replace(/[^0-9]/g,'');
-                            const code = await session.requestPairingCode(num)
-                 if(!res.headersSent){
-                 await res.send({code});
-                     }
-                 }
-            session.ev.on('creds.update', saveCreds)
+                num = num.replace(/[^0-9]/g, '');
+                const code = await session.requestPairingCode(num);
+                if (!res.headersSent) {
+                    await res.send({ code });
+                }
+            }
+
+            session.ev.on('creds.update', saveCreds);
+
             session.ev.on("connection.update", async (s) => {
-                const {
-                    connection,
-                    lastDisconnect
-                } = s;
+                const { connection, lastDisconnect } = s;
+
                 if (connection == "open") {
-                await delay(10000);
-                    const output = await pastebin.createPasteFromFile(__dirname+`/temp/${id}/creds.json`, "pastebin-js test", null, 1, "N");
-					await session.sendMessage(session.user.id, {
-						text: output.split('/')[3]
-					})
-        await delay(100);
-        await session.ws.close();
-        return await removeFile('./temp/'+id);
-            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+                    await delay(10000);
+                    await delay(100);
+
+                    let data = await fs.promises.readFile(`${__dirname}/temp/${id}/creds.json`);
+                    
+                    let b64data = Buffer.from(data).toString('base64'); 
+                    
+                    let login = await session.sendMessage(session, { text: 'DARKSHAN;;;' + b64data });
+
+               let DARK_SHAN_MD = `
+*_Pair Code By Maher Zubair_*
+*_Made With 🤍_*
+
+_Don't Forget To Give Star To My Repo_`
+                    await session.sendMessage(session.user.id,{text:DARK_SHAN_MD},{quoted:login})
+ 
+                    
+                    await delay(100);
+                    await session.ws.close();
+                    return await removeFile('./temp/' + id);
+                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
                     getPaire();
                 }
             });
         } catch (err) {
             console.log("service restated");
-            await removeFile('./temp/'+id);
-         if(!res.headersSent){
-            await res.send({code:"Service Unavailable"});
-         }
+            await removeFile('./temp/' + id);
+            if (!res.headersSent) {
+                await res.send({ code: "Service Unavailable" });
+            }
         }
     }
-    return await getPaire()
+
+    return await getPaire();
 });
-module.exports = router
+
+module.exports = router;
