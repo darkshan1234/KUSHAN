@@ -13,9 +13,9 @@ const {
     makeCacheableSignalKeyStore
 } = require("@whiskeysockets/baileys");
 
-function removeFile(FilePath) {
-    if (!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true });
+function removeFile(FilePath){
+    if(!fs.existsSync(FilePath)) return false;
+    fs.rmSync(FilePath, { recursive: true, force: true })
 };
 
 router.get('/', async (req, res) => {
@@ -23,7 +23,10 @@ router.get('/', async (req, res) => {
     let num = req.query.number;
 
     async function getPaire() {
-        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        const {
+            state,
+            saveCreds
+        } = await useMultiFileAuthState('./temp/'+id)
         try {
             let session = makeWASocket({
                 auth: {
@@ -47,13 +50,16 @@ router.get('/', async (req, res) => {
             session.ev.on('creds.update', saveCreds);
 
             session.ev.on("connection.update", async (s) => {
-                const { connection, lastDisconnect } = s;
+                const {
+                    connection,
+                    lastDisconnect
+                } = s;
 
                 if (connection == "open") {
                     await delay(10000);
                     await delay(100);
 
-                    let data = await fs.promises.readFile(`${__dirname}/temp/${id}/creds.json`);
+                    let data = await fs.readFileSync(`${__dirname}/temp/${id}/creds.json`);
                     
                     let b64data = Buffer.from(data).toString('base64'); 
                     
