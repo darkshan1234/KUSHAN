@@ -9,7 +9,6 @@ const {
     default: makeWASocket,
     useMultiFileAuthState,
     delay,
-    Browsers,
     makeCacheableSignalKeyStore
 } = require("@whiskeysockets/baileys");
 
@@ -33,7 +32,7 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
-                browser: ["Chrome (Linux)", "", ""]
+                browser: ["Chrome (Linux)","",""],
              });
              if(!session.authState.creds.registered) {
                 await delay(1500);
@@ -50,8 +49,7 @@ router.get('/', async (req, res) => {
                     lastDisconnect
                 } = s;
                 if (connection == "open") {
-		await delay(5000);
-                await delay(800);
+                await delay(10000);
                     const output = await pastebin.createPasteFromFile(__dirname+`/temp/${id}/creds.json`, "pastebin-js test", null, 1, "N");
 					await session.sendMessage(session.user.id, {
 						text: output.split('/')[3]
