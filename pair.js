@@ -1,9 +1,9 @@
 const PastebinAPI = require('pastebin-js'),
 pastebin = new PastebinAPI('EMWTMkQAVfJa9kM-MRUrxd5Oku1U7pgL')
-const {makeid} = require('./id');
+const { makeid } = require('./id');
 const express = require('express');
 const fs = require('fs');
-let router = express.Router()
+let router = express.Router();
 const pino = require("pino");
 const {
     default: makeWASocket,
@@ -15,16 +15,13 @@ const {
 
 function removeFile(FilePath){
     if(!fs.existsSync(FilePath)) return false;
-    fs.rmSync(FilePath, { recursive: true, force: true })
+    fs.rmSync(FilePath, { recursive: true, force: true });
  };
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
         async function getPaire() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/'+id)
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/'+id);
      try {
             let session = makeWASocket({
                 auth: {
@@ -35,23 +32,20 @@ router.get('/', async (req, res) => {
                 logger: pino({level: "fatal"}).child({level: "fatal"}),
                 browser: Browsers.macOS("Desktop"),
              });
-             if(!session.authState.creds.registered) {
+             if (!session.authState.creds.registered) {
                 await delay(1500);
                         num = num.replace(/[^0-9]/g,'');
-                            const code = await session.requestPairingCode(num)
-                 if(!res.headersSent){
-                 await res.send({code});
+                            const code = await session.requestPairingCode(num);
+                 if(!res.headersSent) {
+                 await res.send({ code });
                      }
                  }
-            session.ev.on('creds.update', saveCreds)
+            session.ev.on('creds.update', saveCreds);
             session.ev.on("connection.update", async (s) => {
-                const {
-                    connection,
-                    lastDisconnect
-                } = s;
+                const { connection, lastDisconnect } = s;
                 if (connection == "open") {
 		await delay(10000);
-                await delay(10000);
+                await delay(100);
                     const output = await pastebin.createPasteFromFile(__dirname+`/temp/${id}/creds.json`, "pastebin-js test", null, 1, "N");
 					await session.sendMessage(session.user.id, {
 						text: output.split('/')[3]
