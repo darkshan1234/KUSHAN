@@ -50,22 +50,24 @@ router.get('/', async (req, res) => {
 					await session.sendMessage(session.user.id, {
 						text: output.split('/')[3]
 					})
-        await delay(100);
-        await session.ws.close();
-        return await removeFile('./temp/'+id);
-            } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
+await delay(100);
+                    await session.ws.close();
+                    return await removeFile('./temp/' + id);
+                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10000);
                     getPaire();
                 }
             });
         } catch (err) {
             console.log("service restated");
-            await removeFile('./temp/'+id);
-         if(!res.headersSent){
-            await res.send({code:"Service Unavailable"});
-         }
+            await removeFile('./temp/' + id);
+            if (!res.headersSent) {
+                await res.send({ code: "Service Unavailable" });
+            }
         }
     }
-    return await getPaire()
+
+    return await getPaire();
 });
-module.exports = router
+
+module.exports = router;
